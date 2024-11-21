@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "Kargo.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ include "Kargo.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "Kargo.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "Kargo.name" . }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"

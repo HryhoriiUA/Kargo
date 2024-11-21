@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: kargo
+  namespace: argocd
+spec:
+  generators:
+  - list:
+      elements:
+      - stage: dev
+      - stage: test
+      - stage: prod
+  template:
+    metadata:
+      name: kargo-{{stage}}
+      annotations:
+        kargo.akuity.io/authorized-stage: kargo-:{{stage}}
+    spec:
+      project: default
+      sources:                                          # new field
+        - repoURL: https://github.com/HryhoriiUA/Kargo
+          targetRevision: master
+          path: deploy
+          helm:
+            valueFiles:
+              - values-{{stage}}.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: {{stage}}
